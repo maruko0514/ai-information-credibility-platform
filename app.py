@@ -3,6 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import os
 
+import requests
+
+from bs4 import BeautifulSoup
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -55,6 +59,53 @@ def add_todo():
         db.session.commit()
 
     return redirect("/todo")
+
+@app.route("/update/<int:id>", methods=["POST"])
+def update_todo(id):
+
+    todo = Todo.query.get(id)
+
+    if todo:
+
+        new_content = request.form.get("content")
+
+        if new_content:
+
+            todo.content = new_content
+
+            db.session.commit()
+
+    return redirect("/todo")
+
+@app.route("/news")
+def news():
+
+    url = "https://news.ycombinator.com/"
+
+    response = requests.get(url)
+
+    soup = BeautifulSoup(
+        response.text,
+        "html.parser"
+    )
+
+    titles = soup.select(".titleline a")
+
+    result = ""
+
+    news_list = []
+
+    for title in titles:
+
+        news_list.append({
+            "title": title.text,
+            "url": title["href"]
+        })
+
+    return render_template(
+        "news.html",
+        news_list=news_list
+    )
 
 if __name__ == "__main__":
     app.run(
