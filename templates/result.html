@@ -1,0 +1,465 @@
+{% extends "navbar.html" %}
+
+{% block content %}
+
+<div class="hero">
+    <h1>AI 綜合分析報告</h1>
+    <h2>{{ website.title }}</h2>
+    <p>{{ website.domain }}</p>
+</div>
+
+<br>
+
+<div class="card">
+    <h2>AI 資訊健康度</h2>
+
+    <h1 style="font-size:72px;color:#B47471;">
+        {{ ai.health_score }}
+    </h1>
+
+    <h2>/100</h2>
+
+    <progress value="{{ ai.health_score }}" max="100"></progress>
+
+    <br><br>
+
+    {% if ai.health_score >= 85 %}
+        <h2 style="color:green;">★★★★★ 資訊健康</h2>
+    {% elif ai.health_score >= 70 %}
+        <h2 style="color:#B47471;">★★★★☆ 良好</h2>
+    {% elif ai.health_score >= 50 %}
+        <h2 style="color:orange;">★★★☆☆ 普通</h2>
+    {% else %}
+        <h2 style="color:red;">★★☆☆☆ 建議交叉查證</h2>
+    {% endif %}
+
+    <p>
+        此指標整合網站可信度、假新聞風險、資訊泡泡、
+        認知偏誤、多元觀點與來源分析，用來快速評估整體資訊品質。
+    </p>
+</div>
+
+<br>
+
+<div class="card-area">
+
+    <div class="card">
+        <h2>網站可信度</h2>
+        <h1 style="font-size:56px;color:#B47471;">{{ score.score }}</h1>
+        <h2>/100</h2>
+        <progress value="{{ score.score }}" max="100"></progress>
+
+        <br><br>
+
+        {% if score.risk == "低風險" %}
+            <h2 style="color:green;">低風險</h2>
+        {% elif score.risk == "中風險" %}
+            <h2 style="color:orange;">中風險</h2>
+        {% else %}
+            <h2 style="color:red;">高風險</h2>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>假新聞風險</h2>
+        <h1 style="font-size:56px;color:#B47471;">{{ ai.fake_news_score }}</h1>
+        <h2>/100</h2>
+        <progress value="{{ ai.fake_news_score }}" max="100"></progress>
+
+        <br><br>
+
+        {% if ai.fake_news_level == "低風險" %}
+            <h2 style="color:green;">低風險</h2>
+        {% elif ai.fake_news_level == "中風險" %}
+            <h2 style="color:orange;">中風險</h2>
+        {% else %}
+            <h2 style="color:red;">高風險</h2>
+        {% endif %}
+    </div>
+
+</div>
+
+<br>
+
+<div class="card-area">
+
+    <div class="card">
+        <h2>資訊泡泡指數</h2>
+        <h1 style="font-size:56px;color:#B47471;">{{ ai.bubble_score }}</h1>
+        <h2>/100</h2>
+        <progress value="{{ ai.bubble_score }}" max="100"></progress>
+
+        <br><br>
+
+        {% if ai.bubble_score >= 70 %}
+            <h2 style="color:red;">泡泡風險偏高</h2>
+        {% elif ai.bubble_score >= 40 %}
+            <h2 style="color:orange;">泡泡風險中等</h2>
+        {% else %}
+            <h2 style="color:green;">泡泡風險較低</h2>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>認知偏誤程度</h2>
+        <h1 style="font-size:56px;color:#B47471;">{{ ai.bias_score }}</h1>
+        <h2>/100</h2>
+        <progress value="{{ ai.bias_score }}" max="100"></progress>
+
+        <br><br>
+
+        {% if ai.bias_list %}
+            <h3>偵測到的偏誤類型</h3>
+            <ul>
+                {% for bias in ai.bias_list %}
+                    <li>{{ bias }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>未偵測到明顯認知偏誤。</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<br>
+
+<div class="card-area">
+
+    <!-- 點擊誘餌 -->
+    <div class="card">
+
+        <h2>點擊誘餌分析</h2>
+
+        <h1 style="font-size:56px;color:#B47471;">
+            {{ ai.clickbait_score }}
+        </h1>
+
+        <h2>/100</h2>
+
+        <progress value="{{ ai.clickbait_score }}" max="100"></progress>
+
+        <br><br>
+
+        {% if ai.clickbait_score >= 70 %}
+            <h2 style="color:red;">疑似點擊誘餌</h2>
+        {% elif ai.clickbait_score >= 40 %}
+            <h2 style="color:orange;">有部分點擊誘餌特徵</h2>
+        {% else %}
+            <h2 style="color:green;">未發現明顯點擊誘餌</h2>
+        {% endif %}
+
+    </div>
+
+    <!-- 情緒分析 -->
+
+    <div class="card">
+
+        <h2>情緒分析</h2>
+
+        <h1 style="font-size:56px;color:#B47471;">
+            {{ ai.emotion_score }}
+        </h1>
+
+        <h2>/100</h2>
+
+        <progress value="{{ ai.emotion_score }}" max="100"></progress>
+
+        <br><br>
+
+        {% if ai.emotion_score >= 70 %}
+            <h2 style="color:red;">情緒性偏高</h2>
+        {% elif ai.emotion_score >= 40 %}
+            <h2 style="color:orange;">略帶情緒性</h2>
+        {% else %}
+            <h2 style="color:green;">語氣中立</h2>
+        {% endif %}
+
+    </div>
+
+</div>
+
+<br>
+
+<div class="card-area">
+
+    <!-- 多元觀點 -->
+
+    <div class="card">
+
+        <h2>多元觀點分析</h2>
+
+        <h1 style="font-size:56px;color:#B47471;">
+            {{ ai.diversity_score }}
+        </h1>
+
+        <h2>/100</h2>
+
+        <progress value="{{ ai.diversity_score }}" max="100"></progress>
+
+        <br><br>
+
+        {% if ai.diversity_reasons %}
+
+        <ul>
+
+            {% for item in ai.diversity_reasons %}
+
+            <li>{{ item }}</li>
+
+            {% endfor %}
+
+        </ul>
+
+        {% else %}
+
+        <p>未偵測到明顯多元觀點。</p>
+
+        {% endif %}
+
+    </div>
+
+    <!-- 交叉引用 -->
+
+    <div class="card">
+
+        <h2>交叉引用分析</h2>
+
+        <h1 style="font-size:56px;color:#B47471;">
+            {{ ai.cross_reference_score }}
+        </h1>
+
+        <h2>/100</h2>
+
+        <progress value="{{ ai.cross_reference_score }}" max="100"></progress>
+
+        <br><br>
+
+        <p>
+
+            引用可信來源：
+
+            <b>{{ ai.trusted_source_count }}</b>
+
+            個
+
+        </p>
+
+        <p>
+
+            偵測引用資料：
+
+            <b>{{ ai.data_count }}</b>
+
+            筆
+
+        </p>
+
+    </div>
+
+</div>
+
+<br>
+
+<div class="card">
+
+    <h2>AI 綜合分析</h2>
+
+    <p>
+
+        <b>網站可信度：</b>
+
+        {{ ai.credibility }}%
+
+    </p>
+
+    <p>
+
+        <b>語氣分析：</b>
+
+        {{ ai.tone }}
+
+    </p>
+
+    <hr>
+
+    <h3>AI 摘要</h3>
+
+    <p>
+
+        {{ ai.summary }}
+
+    </p>
+
+    <hr>
+
+    <h3>AI 建議</h3>
+
+    <ul>
+
+        {% for s in ai.suggestions %}
+
+        <li>{{ s }}</li>
+
+        {% endfor %}
+
+    </ul>
+
+</div>
+
+<br>
+
+<div class="card-area">
+
+    <!-- 網站資訊 -->
+    <div class="card">
+
+        <h2>網站資訊</h2>
+
+        <table class="table">
+
+            <tr>
+                <th>新聞標題</th>
+                <td>{{ website.title }}</td>
+            </tr>
+
+            <tr>
+                <th>網站</th>
+                <td>{{ website.domain }}</td>
+            </tr>
+
+            <tr>
+                <th>作者</th>
+                <td>{{ website.author if website.author else "無" }}</td>
+            </tr>
+
+            <tr>
+                <th>發布日期</th>
+                <td>{{ website.publish_time if website.publish_time else "無" }}</td>
+            </tr>
+
+            <tr>
+                <th>HTTPS</th>
+                <td>
+                    {% if website.https %}
+                        ✅ 是
+                    {% else %}
+                        ❌ 否
+                    {% endif %}
+                </td>
+            </tr>
+
+            <tr>
+                <th>原始網址</th>
+                <td>
+                    <a href="{{ website.url }}" target="_blank">
+                        {{ website.url }}
+                    </a>
+                </td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    <!-- AI可信度評分 -->
+
+    <div class="card">
+
+        <h2>網站可信度評分依據</h2>
+
+        <ul>
+
+            {% for r in score.reasons %}
+
+                <li>{{ r }}</li>
+
+            {% endfor %}
+
+        </ul>
+
+    </div>
+
+</div>
+
+<br>
+
+<div class="card">
+
+    <h2>資訊泡泡分析原因</h2>
+
+    {% if ai.bubble_reasons %}
+
+        <ul>
+
+        {% for item in ai.bubble_reasons %}
+
+            <li>{{ item }}</li>
+
+        {% endfor %}
+
+        </ul>
+
+    {% else %}
+
+        <p>未發現明顯資訊泡泡。</p>
+
+    {% endif %}
+
+</div>
+
+<br>
+
+<div class="card">
+
+    <h2>文章摘要</h2>
+
+    <div style="line-height:2;white-space:pre-wrap;">
+
+        {{ website.content[:2000] }}
+
+    </div>
+
+</div>
+
+<br>
+
+<div class="card">
+
+    <h2>AI 風險提醒</h2>
+
+    {% if ai.fake_news_score >= 70 %}
+        <p style="color:red;">
+            此文章假新聞風險偏高，建議不要直接轉傳，應先查詢官方或其他可信來源。
+        </p>
+    {% elif ai.fake_news_score >= 40 %}
+        <p style="color:orange;">
+            此文章仍有部分資訊風險，建議進一步交叉查證。
+        </p>
+    {% else %}
+        <p style="color:green;">
+            此文章假新聞風險較低，但仍建議保持查證習慣。
+        </p>
+    {% endif %}
+
+</div>
+
+<br>
+
+<div class="card">
+
+    <h2>分析完成</h2>
+
+    <p>
+        本報告由系統根據網站資料、文章內容、來源線索、
+        認知偏誤、資訊泡泡與多元觀點進行綜合分析。
+    </p>
+
+    <br>
+
+    <a href="/analyze" class="product-btn">重新分析</a>
+    <a href="/dashboard" class="product-btn">查看 Dashboard</a>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,301 @@
+{% extends "navbar.html" %}
+
+{% block content %}
+
+<div class="hero">
+    <h1>Dashboard</h1>
+    <p>AI 網路資訊可信度與風險分析統計總覽</p>
+</div>
+
+<br>
+
+<div class="card-area">
+
+    <div class="card">
+        <h2>分析總次數</h2>
+        <h1>{{ stats.total }}</h1>
+    </div>
+
+    <div class="card">
+        <h2>平均可信度</h2>
+        <h1>{{ stats.avg_score }}</h1>
+        <p>/100</p>
+    </div>
+
+    <div class="card">
+        <h2>平均資訊健康度</h2>
+        <h1>{{ stats.avg_health }}</h1>
+        <p>/100</p>
+    </div>
+
+    <div class="card">
+        <h2>平均假新聞風險</h2>
+        <h1>{{ stats.avg_fake }}</h1>
+        <p>/100</p>
+    </div>
+
+</div>
+
+<br>
+
+<div class="card-area">
+
+    <div class="card">
+        <h2>平均資訊泡泡</h2>
+        <h1>{{ stats.avg_bubble }}</h1>
+        <p>/100</p>
+    </div>
+
+    <div class="card">
+        <h2>平均認知偏誤</h2>
+        <h1>{{ stats.avg_bias }}</h1>
+        <p>/100</p>
+    </div>
+
+    <div class="card">
+        <h2>平均點擊誘餌</h2>
+        <h1>{{ stats.avg_clickbait }}</h1>
+        <p>/100</p>
+    </div>
+
+    <div class="card">
+        <h2>平均情緒分數</h2>
+        <h1>{{ stats.avg_emotion }}</h1>
+        <p>/100</p>
+    </div>
+
+</div>
+
+<br>
+
+<div class="card">
+
+    <h2>AI 統計圖表</h2>
+
+    <div class="chart-grid">
+
+        <div class="chart-card">
+            <h3>風險等級分布</h3>
+            <img src="{{ url_for('static', filename='risk_chart.png') }}"
+                 alt="Risk Chart">
+        </div>
+
+        <div class="chart-card">
+            <h3>AI 分析平均分數</h3>
+            <img src="{{ url_for('static', filename='score_chart.png') }}"
+                 alt="Score Chart">
+        </div>
+
+    </div>
+
+    <br>
+
+    <div class="chart-grid">
+
+        <div class="chart-card">
+            <h3>網站來源類型</h3>
+            <img src="{{ url_for('static', filename='source_chart.png') }}"
+                 alt="Source Chart">
+        </div>
+
+        <div class="chart-card">
+            <h3>Top 10 網站來源</h3>
+            <img src="{{ url_for('static', filename='domain_chart.png') }}"
+                 alt="Domain Chart">
+        </div>
+
+    </div>
+
+    <br>
+
+    <div class="chart-card">
+
+        <h3>最近 7 天分析量</h3>
+
+        <img src="{{ url_for('static', filename='daily_chart.png') }}"
+             alt="Daily Chart">
+
+    </div>
+
+</div>
+
+<br>
+
+<div class="card-area">
+
+    <!-- Top Domain -->
+    <div class="card">
+
+        <h2>網站來源排行榜 Top10</h2>
+
+        <table class="table">
+
+            <thead>
+                <tr>
+                    <th>排名</th>
+                    <th>網站</th>
+                    <th>分析次數</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% if stats.top_domains %}
+
+                {% for row in stats.top_domains %}
+
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ row.domain }}</td>
+                    <td>{{ row.count }}</td>
+                </tr>
+
+                {% endfor %}
+
+            {% else %}
+
+                <tr>
+                    <td colspan="3">目前沒有資料</td>
+                </tr>
+
+            {% endif %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Source Type -->
+
+    <div class="card">
+
+        <h2>網站來源類型</h2>
+
+        <table class="table">
+
+            <thead>
+                <tr>
+                    <th>來源類型</th>
+                    <th>數量</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% if stats.source_types %}
+
+                {% for row in stats.source_types %}
+
+                <tr>
+
+                    <td>{{ row.source_type }}</td>
+
+                    <td>{{ row.count }}</td>
+
+                </tr>
+
+                {% endfor %}
+
+            {% else %}
+
+                <tr>
+
+                    <td colspan="2">目前沒有資料</td>
+
+                </tr>
+
+            {% endif %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<br>
+
+<div class="card">
+
+    <h2>最近分析紀錄</h2>
+
+    <table class="table">
+
+        <thead>
+
+            <tr>
+
+                <th>標題</th>
+
+                <th>網站</th>
+
+                <th>可信度</th>
+
+                <th>健康度</th>
+
+                <th>時間</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% if stats.recent %}
+
+            {% for row in stats.recent %}
+
+            <tr>
+
+                <td>{{ row.title }}</td>
+
+                <td>{{ row.domain }}</td>
+
+                <td>{{ row.credibility_score }}</td>
+
+                <td>{{ row.health_score }}</td>
+
+                <td>{{ row.created_at }}</td>
+
+            </tr>
+
+            {% endfor %}
+
+        {% else %}
+
+            <tr>
+
+                <td colspan="5">
+
+                    尚無分析紀錄
+
+                </td>
+
+            </tr>
+
+        {% endif %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<br>
+
+<div class="card">
+
+    <h2>系統說明</h2>
+
+    <p>
+        本 Dashboard 依據 AI 分析結果，自動統計網站可信度、
+        資訊健康度、假新聞風險、資訊泡泡、認知偏誤、
+        點擊誘餌、情緒分析與網站來源分布，
+        協助使用者快速掌握整體資訊品質。
+    </p>
+
+</div>
+
+{% endblock %}

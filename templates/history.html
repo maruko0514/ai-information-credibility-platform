@@ -1,0 +1,81 @@
+{% extends "navbar.html" %}
+
+{% block content %}
+
+<div class="hero">
+    <h1>分析紀錄</h1>
+    <p>AI 資訊泡泡與認知偏誤分析歷史紀錄</p>
+</div>
+
+<br>
+
+<div class="card">
+
+<table style="width:100%;border-collapse:collapse;">
+
+    <tr style="background:#B47471;color:white;">
+
+        <th>ID</th>
+
+        <th>網站</th>
+
+        <th>標題</th>
+
+        <th>可信度</th>
+
+        <th>資訊泡泡</th>
+
+        <th>認知偏誤</th>
+
+        <th>多元觀點</th>
+
+        <th>風險</th>
+
+        <th>分析時間</th>
+
+    </tr>
+
+    {% for item in histories %}
+
+    <tr>
+
+        <td>{{ item.id }}</td>
+
+        <td>{{ item.domain }}</td>
+
+        <td>{{ item.title }}</td>
+
+        <td>{{ item.credibility_score }}/100</td>
+
+        <td>{{ item.bubble_score }}/100</td>
+
+        <td>{{ item.bias_score }}/100</td>
+
+        <td>{{ item.diversity_score }}/100</td>
+
+        <td>
+
+            {% if item.risk=="低風險" %}
+                <span style="color:green;font-weight:bold;">🟢 {{ item.risk }}</span>
+
+            {% elif item.risk=="中風險" %}
+                <span style="color:orange;font-weight:bold;">🟡 {{ item.risk }}</span>
+
+            {% else %}
+                <span style="color:red;font-weight:bold;">🔴 {{ item.risk }}</span>
+
+            {% endif %}
+
+        </td>
+
+        <td>{{ item.created_at }}</td>
+
+    </tr>
+
+    {% endfor %}
+
+</table>
+
+</div>
+
+{% endblock %}

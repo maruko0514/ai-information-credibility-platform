@@ -1,17 +1,87 @@
-<!DOCTYPE html>
-    <html lang="en">
-        <head>
-            <meta charset="UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>Flask MVP</title>
-            <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-        </head>
-        <body>
-            {% extends "navbar.html" %}
+{% extends "navbar.html" %}
 
-        {% block content %}
-            <h1>Flask MVP Website</h1>
-            <p>這是一個最小可行版本的 Flask 網站。</p>
-            {% endblock %}
-        </body>
-    </html>
+{% block content %}
+
+<section class="hero home-hero">
+
+    <span class="product-label">
+        AI Information Bubble & Cognitive Bias Analysis Platform
+    </span>
+
+    <h1>BubbleAI</h1>
+
+    <h2>Think Before You Believe.</h2>
+
+    <p>
+        透過 AI、網頁爬蟲與資料分析，協助使用者判斷網站可信度、
+        資訊泡泡、認知偏誤、多元觀點與資訊健康度。
+    </p>
+
+    <a href="/analyze" class="product-btn">開始 AI 分析</a>
+
+</section>
+
+<br>
+
+<section class="product-features compact-features">
+
+    <div class="product-card">
+        <span class="card-icon">🌐</span>
+        <h3>Website Crawling</h3>
+        <p>擷取標題、作者、日期、描述與文章內容。</p>
+    </div>
+
+    <div class="product-card">
+        <span class="card-icon">🫧</span>
+        <h3>Information Bubble</h3>
+        <p>分析是否缺少不同觀點、官方資料或多元來源。</p>
+    </div>
+
+    <div class="product-card">
+        <span class="card-icon">🧠</span>
+        <h3>Cognitive Bias</h3>
+        <p>偵測確認偏誤、情緒偏誤、權威偏誤與從眾偏誤。</p>
+    </div>
+
+    <div class="product-card">
+        <span class="card-icon">❤️</span>
+        <h3>Health Index</h3>
+        <p>整合可信度、泡泡風險、偏誤與多元觀點。</p>
+    </div>
+
+</section>
+
+<br>
+
+<div class="card">
+
+    <h2>How It Works</h2>
+
+    <div class="steps">
+        <span>① 輸入網址</span>
+        <span>→</span>
+        <span>② AI 分析</span>
+        <span>→</span>
+        <span>③ 查看分析報告</span>
+    </div>
+
+</div>
+
+<br>
+
+<div class="card">
+
+    <h2>Technology Stack</h2>
+
+    <div class="tech-row">
+        <span>🐍 Python</span>
+        <span>⚡ Flask</span>
+        <span>🌐 BeautifulSoup</span>
+        <span>🗄 SQLite</span>
+        <span>📊 Matplotlib</span>
+        <span>🤖 AI Analysis</span>
+    </div>
+
+</div>
+
+{% endblock %}

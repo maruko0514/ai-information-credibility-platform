@@ -1,11 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>CrediAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+<body>
+
+<header class="nav-bar">
+    <div class="nav-logo">BubbleAI</div>
+
     <nav>
-        <a href="{{ url_for('home') }}">首頁</a>
-        <a href="{{ url_for('html_tags') }}">HTML 展示</a>
-        <a href="{{ url_for('todo') }}">Todo</a>
-        <a href="{{ url_for('news') }}">Hacknews</a>
-        <a href="{{ url_for('quotes') }}">Quotes</a>
+        <a href="/">首頁</a>
+        <a href="/analyze">分析</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/history">紀錄</a>
+        <a href="/about">關於</a>
     </nav>
+</header>
 
-    <hr>
+<main>
+    {% block content %}
+    {% endblock %}
+</main>
 
-    {% block content %}{% endblock %}
+<footer>
+    <h2>BubbleAI</h2>
+
+    <p>
+        AI Information Bubble & Cognitive Bias Analysis Platform
+    </p>
+
+    <p>
+        Final Project<br>
+        Department of Mathematics & Information Science<br>
+        Fu Jen Catholic University
+    </p>
+
+    <p>© 2026</p>
+</footer>
+
+</body>
+</html>

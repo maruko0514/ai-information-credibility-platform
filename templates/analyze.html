@@ -1,0 +1,85 @@
+{% extends "navbar.html" %}
+
+{% block content %}
+
+<div class="hero">
+
+    <h1>AI Website Analysis</h1>
+
+    <p>
+        請輸入欲分析的網站網址，系統將分析網站可信度、
+        資訊泡泡、認知偏誤、多元觀點與資訊健康度。
+    </p>
+
+    {% if error %}
+        <p style="color:red;font-weight:bold;">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST">
+
+        <input
+            type="text"
+            name="url"
+            placeholder="https://example.com"
+            style="width:80%;padding:16px;font-size:18px;border-radius:14px;border:1px solid #ddd;"
+        >
+
+        <br><br>
+
+        <button class="product-btn">
+            開始 AI 分析
+        </button>
+
+    </form>
+
+    <div id="loading" style="display:none;">
+
+    <div class="loading-box">
+
+        <h2>🤖 AI 正在分析中...</h2>
+
+        <br>
+
+        <p id="loading-text">
+            🌐 正在連線網站...
+        </p>
+
+        <div class="loading-bar">
+
+            <span id="loading-progress"></span>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+<br>
+
+<div class="card-area">
+
+    <div class="card">
+        <h2>Website Credibility</h2>
+        <p>檢查 HTTPS、作者、日期、網域與內容完整度。</p>
+    </div>
+
+    <div class="card">
+        <h2>Information Bubble</h2>
+        <p>評估是否缺少不同觀點、官方資料或多元來源。</p>
+    </div>
+
+    <div class="card">
+        <h2>Cognitive Bias</h2>
+        <p>分析確認偏誤、情緒偏誤、權威偏誤與從眾偏誤。</p>
+    </div>
+
+    <div class="card">
+        <h2>Information Health Index</h2>
+        <p>整合多項指標，提供整體資訊品質評估。</p>
+    </div>
+
+</div>
+
+{% endblock %}

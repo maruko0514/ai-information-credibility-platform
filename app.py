@@ -1,164 +1,127 @@
-from flask import Flask, render_template, request, redirect
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request
 from dotenv import load_dotenv
 import os
 
-import requests
+from dashboard import generate_dashboard_charts
+from crawler import crawl_website
+from risk_score import calculate_score
+from ai_analyzer import simple_ai_analysis
+from database import (
+    init_db,
+    save_analysis,
+    get_all_history,
+    get_dashboard_stats
+)
 
-from bs4 import BeautifulSoup
-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-
-load_dotenv()
+load_dotenv(override=True)
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key")
 
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+init_db()
 
-db = SQLAlchemy(app)
-
-class Todo(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-
-    content = db.Column(
-        db.String(200),
-        nullable=False
-    )
-
-with app.app_context():
-    db.create_all()
 
 @app.route("/")
 def home():
     return render_template("home.html")
 
-@app.route("/html_tags")
-def html_tags():
-    return render_template("html_tags.html")
 
-@app.route("/todo")
-def todo():
+@app.route("/analyze", methods=["GET", "POST"])
+def analyze():
 
-    todos = Todo.query.all()
+    if request.method == "POST":
 
-    return render_template(
-        "todo.html",
-        todos=todos
-    )
+        url = request.form.get("url", "").strip()
 
-@app.route("/add", methods=["POST"])
-def add_todo():
+        if not url:
+            return render_template(
+                "analyze.html",
+                error="請輸入網址"
+            )
 
-    content = request.form.get("content")
+        website = crawl_website(url)
 
-    if content:
+        if not website.get("success"):
+            return render_template(
+                "result.html",
+                website=website,
+                score={
+                    "score": 0,
+                    "risk": "抓取失敗",
+                    "reasons": [
+                        website.get("error", "無法取得網站內容，請確認網址是否正確。")
+                    ]
+                },
+                ai={
+                    "tone": "無法分析",
+                    "credibility": 0,
+                    "summary": "因網站內容抓取失敗，系統無法進行可信度、資訊泡泡與認知偏誤分析。",
+                    "warning_words": [],
+                    "bubble_score": 0,
+                    "bubble_reasons": ["無法取得文章內容"],
+                    "bias_score": 0,
+                    "bias_list": [],
+                    "diversity_score": 0,
+                    "diversity_reasons": ["無法取得文章內容"],
+                    "health_score": 0,
+                    "suggestions": ["請確認網址是否正確，或改用其他可公開瀏覽的新聞網址。"]
+                }
+            )
 
-        new_todo = Todo(content=content)
+        score = calculate_score(website)
 
-        db.session.add(new_todo)
-
-        db.session.commit()
-
-    return redirect("/todo")
-
-@app.route("/update/<int:id>", methods=["POST"])
-def update_todo(id):
-
-    todo = Todo.query.get(id)
-
-    if todo:
-
-        new_content = request.form.get("content")
-
-        if new_content:
-
-            todo.content = new_content
-
-            db.session.commit()
-
-    return redirect("/todo")
-
-@app.route("/news")
-def news():
-
-    url = "https://news.ycombinator.com/"
-
-    response = requests.get(url)
-
-    soup = BeautifulSoup(
-        response.text,
-        "html.parser"
-    )
-
-    titles = soup.select(".titleline a")
-
-    result = ""
-
-    news_list = []
-
-    for title in titles:
-
-        news_list.append({
-            "title": title.text,
-            "url": title["href"]
-        })
-
-    return render_template(
-        "news.html",
-        news_list=news_list
-    )
-
-@app.route("/quotes")
-def quotes():
-    options = Options()
-    options.binary_location = "/usr/bin/chromium"
-    options.add_argument("--headless=new")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-gpu")
-
-    driver = webdriver.Chrome(options=options)
-
-    try:
-        driver.get("https://quotes.toscrape.com/js/")
-
-        quote_elements = driver.find_elements(
-            By.CLASS_NAME,
-            "quote"
+        ai = simple_ai_analysis(
+            website.get("content", ""),
+            score,
+            website
         )
 
-        quote_list = []
+        save_analysis(website, score, ai)
 
-        for quote in quote_elements:
-
-            text = quote.find_element(
-                By.CLASS_NAME,
-                "text"
-            ).text
-
-            author = quote.find_element(
-                By.CLASS_NAME,
-                "author"
-            ).text
-
-            quote_list.append({
-                "text": text,
-                "author": author
-            })
-
-    finally:
-        driver.quit()
         return render_template(
-        "quotes.html",
-        quote_list=quote_list
+            "result.html",
+            website=website,
+            score=score,
+            ai=ai
+        )
+
+    return render_template("analyze.html")
+
+
+@app.route("/history")
+def history():
+
+    histories = get_all_history()
+
+    return render_template(
+        "history.html",
+        histories=histories
     )
 
+
+@app.route("/dashboard")
+def dashboard():
+
+    stats = get_dashboard_stats()
+
+    generate_dashboard_charts(stats)
+
+    return render_template(
+        "dashboard.html",
+        stats=stats
+    )
+
+
+@app.route("/about")
+def about():
+
+    return render_template("about.html")
+
+
 if __name__ == "__main__":
+
     app.run(
-        host="0.0.0.0", 
-        port=int(os.environ.get("PORT",5000)),
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5002)),
         debug=True
     )
