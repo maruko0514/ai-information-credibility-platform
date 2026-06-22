@@ -2,6 +2,7 @@ import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
@@ -108,7 +109,7 @@ def save_analysis(website, score, ai):
         ai.get("trusted_source_count", 0),
         ai.get("data_count", 0),
         score.get("risk", ""),
-        datetime.now()
+        datetime.now(ZoneInfo("Asia/Taipei"))
     ))
 
     conn.commit()
@@ -121,10 +122,11 @@ def get_all_history():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT *
+        SELECT *,
+        created_at + INTERVAL '8 hours' AS created_at
         FROM analysis_history
         ORDER BY id DESC
-    """)
+     """)
 
     rows = cur.fetchall()
 
@@ -138,13 +140,25 @@ def get_dashboard_stats():
     conn = get_connection()
     cur = conn.cursor()
 
+    def avg(column):
+        cur.execute(f"SELECT AVG({column}) AS value FROM analysis_history")
+        row = cur.fetchone()
+        return round(row["value"] or 0, 1)
+
     cur.execute("SELECT COUNT(*) AS total FROM analysis_history")
     total = cur.fetchone()["total"] or 0
 
-    def avg(column):
-        cur.execute(f"SELECT AVG({column}) AS value FROM analysis_history")
-        value = cur.fetchone()["value"]
-        return round(value or 0, 1)
+    avg_score = avg("credibility_score")
+    avg_health = avg("health_score")
+    avg_fake = avg("fake_news_score")
+    avg_bubble = avg("bubble_score")
+    avg_bias = avg("bias_score")
+    avg_diversity = avg("diversity_score")
+    avg_clickbait = avg("clickbait_score")
+    avg_emotion = avg("emotion_score")
+    avg_cross = avg("cross_reference_score")
+    avg_trusted_sources = avg("trusted_source_count")
+    avg_data_count = avg("data_count")
 
     cur.execute("SELECT COUNT(*) AS count FROM analysis_history WHERE risk = '低風險'")
     low = cur.fetchone()["count"] or 0
@@ -182,7 +196,8 @@ def get_dashboard_stats():
     daily_counts = cur.fetchall()
 
     cur.execute("""
-        SELECT *
+        SELECT *,
+        created_at + INTERVAL '8 hours' AS created_at
         FROM analysis_history
         ORDER BY id DESC
         LIMIT 5
@@ -194,17 +209,17 @@ def get_dashboard_stats():
 
     return {
         "total": total,
-        "avg_score": avg("credibility_score"),
-        "avg_health": avg("health_score"),
-        "avg_fake": avg("fake_news_score"),
-        "avg_bubble": avg("bubble_score"),
-        "avg_bias": avg("bias_score"),
-        "avg_diversity": avg("diversity_score"),
-        "avg_clickbait": avg("clickbait_score"),
-        "avg_emotion": avg("emotion_score"),
-        "avg_cross": avg("cross_reference_score"),
-        "avg_trusted_sources": avg("trusted_source_count"),
-        "avg_data_count": avg("data_count"),
+        "avg_score": avg_score,
+        "avg_health": avg_health,
+        "avg_fake": avg_fake,
+        "avg_bubble": avg_bubble,
+        "avg_bias": avg_bias,
+        "avg_diversity": avg_diversity,
+        "avg_clickbait": avg_clickbait,
+        "avg_emotion": avg_emotion,
+        "avg_cross": avg_cross,
+        "avg_trusted_sources": avg_trusted_sources,
+        "avg_data_count": avg_data_count,
         "low": low,
         "middle": middle,
         "high": high,
