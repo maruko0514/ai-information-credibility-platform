@@ -71,26 +71,39 @@
 # 系統架構
 
 ```
-使用者
-      │
-      ▼
-Flask Web
-      │
-      ▼
-Web Crawler
-      │
-      ▼
-AI Analyzer
-      │
- ┌────┼───────────────┐
- ▼    ▼               ▼
-可信度  假新聞風險   偏誤分析
-      │
-      ▼
-PostgreSQL Database
-      │
-      ▼
-Dashboard / History
+                    使用者
+                       │
+                       ▼
+                 Flask Web
+          (接收新聞網址、控制流程)
+                       │
+                       ▼
+                 Web Crawler
+     (擷取標題、作者、日期、內容)
+                       │
+                       ▼
+                 AI Analyzer
+                       │
+                       ▼
+               九項可信度分析
+        ┌────────────────────────────┐
+        │ Website Credibility        │
+        │ Information Health         │
+        │ Fake News Risk             │
+        │ Bubble Score               │
+        │ Bias Score                 │
+        │ Diversity Score            │
+        │ Clickbait Score            │
+        │ Emotion Score              │
+        │ Cross Reference Score      │
+        └────────────────────────────┘
+                       │
+                       ▼
+            PostgreSQL Database
+                       │
+             ┌─────────┴─────────┐
+             ▼                   ▼
+         Dashboard            History
 ```
 
 ---
