@@ -38,6 +38,7 @@ def analyze():
                 "analyze.html",
                 error="請輸入網址"
             )
+        
 
         website = crawl_website(url)
 
